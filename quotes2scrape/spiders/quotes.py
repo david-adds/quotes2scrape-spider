@@ -30,5 +30,12 @@ class QuotesSpider(scrapy.Spider):
                 'author':quote.xpath(".//small/text()").get(),
                 'tags':quote.xpath(".//div[contains(@class,'tag')]/a/text()").getall()
             }
-   
+            
+        next_page = response.xpath(
+             "//li[@class='next']/a/@href").get()
+        if next_page:
+            absolute_url = f"http://quotes.toscrape.com{next_page}"
+            yield SplashRequest(url=absolute_url, callback=self.parse, endpoint='execute', args={
+                'lua_source': self.script
+            })
         
