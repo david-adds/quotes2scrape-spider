@@ -5,8 +5,7 @@ from scrapy_splash import SplashRequest
 class QuotesSpider(scrapy.Spider):
     name = 'quotes'
     allowed_domains = ['quotes.toscrape.com']
-    start_urls = ['http://quotes.toscrape.com/']
-    
+        
     script = '''
         function main(splash,args)
             splash.private_mode_enable = false
@@ -25,5 +24,11 @@ class QuotesSpider(scrapy.Spider):
         })
 
     def parse(self, response):
-        print(response.body)
+        for quote in response.xpath("//div[contains(@class,'quote')]"):
+            yield{
+                'quote':quote.xpath(".//span[1]/text()").get(),
+                'author':quote.xpath(".//small/text()").get(),
+                'tags':quote.xpath(".//div[contains(@class,'tag')]/a/text()").getall()
+            }
+   
         
